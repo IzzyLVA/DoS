@@ -42,8 +42,8 @@ To get started with the **DoS Stress Tester**, you'll need to have Python 3 and 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/dos-stress-tester.git
-    cd dos-stress-tester
+    git clone https://github.com/IzzyLVA/DoS.git
+    cd DoS
     ```
 
 2. Install required dependencies:
@@ -58,14 +58,14 @@ To get started with the **DoS Stress Tester**, you'll need to have Python 3 and 
 
 4. Once everything is set up, you can run the script directly:
     ```bash
-    python3 dos_stress_tester.py
+    python3 DoS.py
     ```
 
 ## Usage
 
 1. **Run the Script**:
    ```bash
-   python3 dos_stress_tester.py
+   python3 DoS.py
 2. **Input the Target IP**:
 
    The script will prompt you to enter the target IP address. Make sure you only target authorized IP addresses (e.g., your own local server or test machine).
