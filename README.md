@@ -4,7 +4,7 @@
 
 ## Overview
 
-The **DDoS Stress Tester** is a Python-based tool designed to simulate network traffic to test the resilience of servers within controlled environments, such as your own local network or test lab. It is strictly intended for **ethical and legal use only**.
+The **DoS Stress Tester** is a Python-based tool designed to simulate network traffic to test the resilience of servers within controlled environments, such as your own local network or test lab. It is strictly intended for **ethical and legal use only**.
 
 With the ability to adjust packet sizes, control threads, and limit packets per second (pps), this tool allows users to simulate a controlled stress test on a specified IP address to understand how it performs under heavy traffic conditions.
 
@@ -31,7 +31,7 @@ By using this tool, you agree to take full responsibility for its use and any le
 
 ## Installation
 
-To get started with the **DDoS Stress Tester**, you'll need to have Python 3 and some dependencies installed.
+To get started with the **DoS Stress Tester**, you'll need to have Python 3 and some dependencies installed.
 
 ### Prerequisites
 
@@ -42,8 +42,8 @@ To get started with the **DDoS Stress Tester**, you'll need to have Python 3 and
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/ddos-stress-tester.git
-    cd ddos-stress-tester
+    git clone https://github.com/your-username/dos-stress-tester.git
+    cd dos-stress-tester
     ```
 
 2. Install required dependencies:
@@ -58,14 +58,14 @@ To get started with the **DDoS Stress Tester**, you'll need to have Python 3 and
 
 4. Once everything is set up, you can run the script directly:
     ```bash
-    python3 ddos_stress_tester.py
+    python3 dos_stress_tester.py
     ```
 
 ## Usage
 
 1. **Run the Script**:
    ```bash
-   python3 ddos_stress_tester.py
+   python3 dos_stress_tester.py
 2. **Input the Target IP**:
 
    The script will prompt you to enter the target IP address. Make sure you only target authorized IP addresses (e.g., your own local server or test machine).
