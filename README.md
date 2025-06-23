@@ -42,7 +42,7 @@ To get started with the **DoS Stress Tester**, you'll need to have Python 3 and 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/IzzyLVA/DoS.git
+    git clone https://github.com/IzzyLVA/DoS
     cd DoS
     ```
 
