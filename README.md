@@ -1,4 +1,4 @@
-# DDoS Stress Tester v4.0
+# DoS Stress Tester v4.0
 
 **WARNING: This tool is for testing and educational purposes only. Misuse of this tool for illegal activities may be subject to severe penalties.**
 
