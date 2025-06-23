@@ -85,12 +85,13 @@ To get started with the **DoS Stress Tester**, you'll need to have Python 3 and 
 6. **Test Results**:
 
     After the test is complete, the script will output a summary with the number of packets sent, the duration, and the average packets per second (pps).
+7. **WHITELIST**
+
+   The Script is set to not run if the IP is not in the Whitelist categorey, you will have to manually add the IP to the categorey in order to use it. This is a safety feature.
 
 ## Configuration
 
 You can customize the behavior of the tool by modifying the following variables in the script:
-
-    VERSION: The version number of the tool.
 
     THREADS: Number of threads to simulate the attack (based on CPU cores).
 
